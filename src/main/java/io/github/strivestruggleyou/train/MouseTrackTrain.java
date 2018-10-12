@@ -44,9 +44,6 @@ public class MouseTrackTrain {
     public static void main(String args[]) throws XGBoostError {
         DMatrix trainMat = new DMatrix(
                 "/Users/manager/yunpian-blackcat/src/main/resources/text/train40.txt");
-        DMatrix testMat = new DMatrix(
-                "/Users/manager/yunpian-blackcat/src/main/resources/text/test.txt");
-
         HashMap<String, Object> params = new HashMap<String, Object>();
         params.put("eta", 1.0);
         params.put("max_depth", 2);
@@ -55,20 +52,12 @@ public class MouseTrackTrain {
 
         HashMap<String, DMatrix> watches = new HashMap<String, DMatrix>();
         watches.put("train", trainMat);
-//        watches.put("test", testMat);
 
-        //set round
         int round = 2;
 
         //train a boost model
         Booster booster = XGBoost.train(trainMat, params, round, watches, null, null);
 
-        //predict
-        float[][] predicts = booster.predict(testMat);
-
-        System.out.println("nihao:" + predicts);
-
-        //save model to modelPath
         File file = new File("./model");
         if (!file.exists()) {
             file.mkdirs();
@@ -77,23 +66,6 @@ public class MouseTrackTrain {
         String modelPath = "./model/xgb.model";
         booster.saveModel(modelPath);
 
-        //dump model with feature map
-//        String[] modelInfos = booster.getModelDump("/Users/manager/yunpian-blackcat/src/main/resources/text/featmap.txt", false);
-//        saveDumpModel("./model/dump.raw.txt", modelInfos);
-//
-//        //save dmatrix into binary buffer
-//        testMat.saveBinary("./model/dtest.buffer");
-
-        //reload model and data
-        Booster booster2 = XGBoost.loadModel("./model/xgb.model");
-        DMatrix testMat2 = new DMatrix("./model/dtest.buffer");
-
-        float[][] predicts2 = booster2.predict(testMat2);
-
-        System.out.println(predicts2);
-
-        //check the two predicts
-        System.out.println(checkPredicts(predicts, predicts2));
     }
 
 }
